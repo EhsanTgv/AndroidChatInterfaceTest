@@ -6,6 +6,10 @@ import com.taghavi.androidchatinterface.models.Message
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.kotlinandroidextensions.GroupieViewHolder
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,6 +21,16 @@ class MainActivity : AppCompatActivity() {
 
         recyclerView.adapter = messageAdapter
         populateData()
+
+        button.setOnClickListener {
+            val message = Message(text = editText.text.toString(), sendBy = "me")
+            val sendMessageItem = SendMessageItem(message)
+
+            messageAdapter.add(sendMessageItem)
+            editText.text.clear()
+
+            receiveAutoResponse()
+        }
     }
 
     private fun populateData() {
@@ -27,6 +41,19 @@ class MainActivity : AppCompatActivity() {
             } else {
                 messageAdapter.add(ReceiveMessageItem(it))
             }
+        }
+    }
+
+    private fun receiveAutoResponse() {
+        GlobalScope.launch(Dispatchers.Main) {
+            delay(1000)
+            val receive = Message(
+                text = "Salut l'amis j'espere que vous allez bien, je suis tres bien j'ai manger to day",
+                sendBy = "me"
+            )
+            val receiveItem = ReceiveMessageItem(receive)
+
+            messageAdapter.add(receiveItem)
         }
     }
 }
